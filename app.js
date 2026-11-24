@@ -64,56 +64,78 @@ config.games.forEach(game => {
 
 function createSlideshow(card, cover, images, title) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const interval = 4500;
+  const manualDelay = 10000;
   let current = 0;
-  let paused = reducedMotion.matches;
-  let hovered = false;
-  let focused = false;
   let timer = null;
+  let holdUntil = 0;
+  let gesture = null;
+  let suppressClickUntil = 0;
   card.classList.add('has-slideshow');
+  images.forEach(image => { image.draggable = false; });
+
   const controls = element('div', 'slideshow-controls');
   controls.setAttribute('role', 'group');
   controls.setAttribute('aria-label', `${title} screenshots`);
-  const pause = element('button', 'slideshow-pause');
-  pause.type = 'button';
-  const dots = element('div', 'slideshow-dots');
-  const choices = images.map((image, index) => {
-    const button = element('button', 'slideshow-dot');
+  for (const [direction, label, glyph] of [[-1, 'Previous', '‹'], [1, 'Next', '›']]) {
+    const button = element('button', 'slideshow-arrow ' + (direction < 0 ? 'slideshow-prev' : 'slideshow-next'), glyph);
     button.type = 'button';
-    button.setAttribute('aria-label', `Show screenshot ${index + 1}: ${image.alt}`);
-    button.addEventListener('click', () => { show(index); schedule(); });
-    dots.append(button);
-    return button;
-  });
-  controls.append(pause, dots);
-  // Controls are siblings of the play link, keeping buttons out of the anchor.
+    button.setAttribute('aria-label', `${label} ${title} screenshot`);
+    button.addEventListener('click', () => navigate(direction));
+    controls.append(button);
+  }
+  // Sibling controls keep navigation buttons outside the game link.
   card.append(controls);
+
   function show(index) {
-    if (!images[index].complete || !images[index].naturalWidth) return;
-    current = index;
+    const next = (index + images.length) % images.length;
+    if (!images[next].complete || !images[next].naturalWidth) return;
+    current = next;
     images.forEach((image, i) => {
       image.classList.toggle('is-active', i === current);
       image.setAttribute('aria-hidden', String(i !== current));
-      choices[i].setAttribute('aria-current', String(i === current));
     });
   }
   function schedule() {
-    clearInterval(timer);
+    clearTimeout(timer);
     timer = null;
-    pause.textContent = paused ? 'Play slides' : 'Pause slides';
-    pause.setAttribute('aria-label', `${paused ? 'Play' : 'Pause'} ${title} screenshot slideshow`);
-    if (paused || hovered || focused || document.hidden) return;
-    timer = setInterval(() => show((current + 1) % images.length), 4500);
+    if (reducedMotion.matches || document.hidden || gesture) return;
+    timer = setTimeout(() => {
+      show(current + 1);
+      schedule();
+    }, Math.max(interval, holdUntil - Date.now()));
   }
-  pause.addEventListener('click', () => { paused = !paused; schedule(); });
-  card.addEventListener('mouseenter', () => { hovered = true; schedule(); });
-  card.addEventListener('mouseleave', () => { hovered = false; schedule(); });
-  card.addEventListener('focusin', () => { focused = true; schedule(); });
-  card.addEventListener('focusout', event => {
-    if (!card.contains(event.relatedTarget)) { focused = false; schedule(); }
+  function navigate(direction) {
+    show(current + direction);
+    holdUntil = Date.now() + manualDelay;
+    schedule();
+  }
+  cover.addEventListener('pointerdown', event => {
+    if (event.pointerType !== 'touch' || !event.isPrimary) return;
+    gesture = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    cover.setPointerCapture(event.pointerId);
+    schedule();
   });
-  reducedMotion.addEventListener('change', () => { paused = reducedMotion.matches; schedule(); });
+  cover.addEventListener('pointerup', event => {
+    if (!gesture || gesture.id !== event.pointerId) return;
+    const dx = event.clientX - gesture.x;
+    const dy = event.clientY - gesture.y;
+    gesture = null;
+    if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      suppressClickUntil = Date.now() + 600;
+      event.preventDefault();
+      navigate(dx < 0 ? 1 : -1);
+    } else schedule();
+  });
+  cover.addEventListener('pointercancel', () => { gesture = null; schedule(); });
+  // A horizontal swipe changes screenshots without following the play link.
+  card.addEventListener('click', event => {
+    if (Date.now() < suppressClickUntil && cover.contains(event.target)) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }, true);
+  reducedMotion.addEventListener('change', schedule);
   document.addEventListener('visibilitychange', schedule);
-  images[0].addEventListener('load', () => show(current), { once: true });
-  choices[0].setAttribute('aria-current', 'true');
   schedule();
 }

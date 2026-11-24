@@ -30,18 +30,16 @@ function moonweaveSeason(date = new Date()) {
 
 (() => {
   const toggle = document.querySelector('#seasonal-toggle');
-  const status = document.querySelector('#seasonal-status');
   const canvas = document.querySelector('#seasonal-background');
-  if (!toggle || !status || !canvas) return;
+  if (!toggle || !canvas) return;
   const ctx = canvas.getContext('2d');
-  if (!ctx) { toggle.disabled = true; status.textContent = 'Seasonal effects are unavailable in this browser.'; return; }
+  if (!ctx) { toggle.disabled = true; return; }
   const storageKey = 'moonweave.seasonal.v1';
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let enabled = true;
   try { enabled = localStorage.getItem(storageKey) !== 'off'; } catch {}
   let season = null, sprites = [], particles = [], width = 0, height = 0;
   let frame = null, last = 0, midnight = null;
-  const names = { christmas: 'Christmas snow', halloween: 'Halloween maple leaves', easter: 'Easter eggs' };
   const random = (min, max) => min + Math.random() * (max - min);
 
   function sprite(kind, variant, light) {
@@ -148,7 +146,6 @@ function moonweaveSeason(date = new Date()) {
     const active = enabled && !!season;
     canvas.hidden = !active;
     document.documentElement.dataset.season = active ? season : 'none';
-    status.textContent = !enabled ? 'Seasonal effects are off.' : !season ? 'Automatically appears within two weeks of each holiday.' : names[season] + (motion.matches ? ' · still artwork for reduced motion.' : ' · active now.');
     rebuild();
     if (active && !document.hidden) {
       if (motion.matches) draw(0); else frame = requestAnimationFrame(animate);

@@ -10,7 +10,13 @@ window.MOONWEAVE = {
       description: 'A board, a roll of the dice, and your next move.',
       category: 'Board game',
       platform: 'Unity Play',
-      cover: 'assets/molopony-cover.webp',
+      cover: 'assets/molopony-board.jpg',
+      screenshots: [
+        { src: 'assets/molopony-board.jpg', alt: 'The Molopony board at the start of a turn' },
+        { src: 'assets/molopony-doubles.jpg', alt: 'Glowing dice rolling after a double' },
+        { src: 'assets/molopony-buy.jpg', alt: 'Buying Ipswich and viewing its title deed' },
+        { src: 'assets/molopony-trade.jpg', alt: 'Trading Ipswich and cash for Heathrow Airport' }
+      ],
       url: 'https://play.unity.com/en/games/ca80f454-c6a9-4d45-bdf2-18549747b6c5/molopony'
     }
   ]

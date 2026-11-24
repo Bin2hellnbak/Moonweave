@@ -44,11 +44,76 @@ config.games.forEach(game => {
   link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
   link.setAttribute('aria-label', `Play ${game.title} on ${game.platform} (opens in a new tab)`);
   const cover = element('div', 'game-cover');
-  const image = element('img', 'cover-image'); image.src = game.cover; image.alt = `${game.title} game artwork`; image.width = 1799; image.height = 995;
-  cover.append(image, element('span', 'cover-label', game.platform));
+  const screenshots = game.screenshots?.length ? game.screenshots : [{ src: game.cover, alt: `${game.title} game artwork` }];
+  const images = screenshots.map((shot, index) => {
+    const image = element('img', 'cover-image' + (screenshots.length > 1 ? ' slideshow-slide' + (index === 0 ? ' is-active' : '') : ''));
+    image.src = shot.src; image.alt = shot.alt; image.width = 1280; image.height = 720;
+    image.decoding = 'async';
+    image.setAttribute('aria-hidden', String(index !== 0));
+    cover.append(image);
+    return image;
+  });
+  cover.append(element('span', 'cover-label', game.platform));
   const body = element('div', 'game-body');
   body.append(element('span', 'game-category', game.category), element('h3', 'game-title', game.title), element('p', 'game-description', game.description));
   const bottom = element('div', 'card-bottom');
   bottom.append(element('span', 'play-button', '▷  Play now'), element('span', 'platform-note', 'Opens on Unity Play'));
   body.append(bottom); link.append(cover, body); card.append(link); grid.append(card);
+  if (images.length > 1) createSlideshow(card, cover, images, game.title);
 });
+
+function createSlideshow(card, cover, images, title) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let current = 0;
+  let paused = reducedMotion.matches;
+  let hovered = false;
+  let focused = false;
+  let timer = null;
+  card.classList.add('has-slideshow');
+  const controls = element('div', 'slideshow-controls');
+  controls.setAttribute('role', 'group');
+  controls.setAttribute('aria-label', `${title} screenshots`);
+  const pause = element('button', 'slideshow-pause');
+  pause.type = 'button';
+  const dots = element('div', 'slideshow-dots');
+  const choices = images.map((image, index) => {
+    const button = element('button', 'slideshow-dot');
+    button.type = 'button';
+    button.setAttribute('aria-label', `Show screenshot ${index + 1}: ${image.alt}`);
+    button.addEventListener('click', () => { show(index); schedule(); });
+    dots.append(button);
+    return button;
+  });
+  controls.append(pause, dots);
+  // Controls are siblings of the play link, keeping buttons out of the anchor.
+  card.append(controls);
+  function show(index) {
+    if (!images[index].complete || !images[index].naturalWidth) return;
+    current = index;
+    images.forEach((image, i) => {
+      image.classList.toggle('is-active', i === current);
+      image.setAttribute('aria-hidden', String(i !== current));
+      choices[i].setAttribute('aria-current', String(i === current));
+    });
+  }
+  function schedule() {
+    clearInterval(timer);
+    timer = null;
+    pause.textContent = paused ? 'Play slides' : 'Pause slides';
+    pause.setAttribute('aria-label', `${paused ? 'Play' : 'Pause'} ${title} screenshot slideshow`);
+    if (paused || hovered || focused || document.hidden) return;
+    timer = setInterval(() => show((current + 1) % images.length), 4500);
+  }
+  pause.addEventListener('click', () => { paused = !paused; schedule(); });
+  card.addEventListener('mouseenter', () => { hovered = true; schedule(); });
+  card.addEventListener('mouseleave', () => { hovered = false; schedule(); });
+  card.addEventListener('focusin', () => { focused = true; schedule(); });
+  card.addEventListener('focusout', event => {
+    if (!card.contains(event.relatedTarget)) { focused = false; schedule(); }
+  });
+  reducedMotion.addEventListener('change', () => { paused = reducedMotion.matches; schedule(); });
+  document.addEventListener('visibilitychange', schedule);
+  images[0].addEventListener('load', () => show(current), { once: true });
+  choices[0].setAttribute('aria-current', 'true');
+  schedule();
+}

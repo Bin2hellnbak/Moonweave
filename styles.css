@@ -34,3 +34,17 @@
 /* Original Eon Games artwork, shown in full. */
 .other-site-art.eon-art{display:block;height:auto;aspect-ratio:2221/1238;padding:0;background:var(--surface-raised)}
 .eon-logo-image{display:block;width:100%;max-width:100%;height:auto;object-fit:contain}
+
+/* Gameplay screenshots: full frames, soft fades and accessible controls. */
+.has-slideshow{position:relative}
+.has-slideshow .game-cover{aspect-ratio:16/9}
+.has-slideshow .slideshow-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .7s ease;transform:none}
+.has-slideshow .slideshow-slide.is-active{opacity:1}
+.has-slideshow:hover .cover-image{transform:none}
+.slideshow-controls{position:absolute;top:0;left:0;right:0;aspect-ratio:16/9;pointer-events:none}
+.slideshow-pause{position:absolute;top:10px;left:10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);padding:5px 8px;font-size:.75rem;pointer-events:auto}
+.slideshow-pause:hover{border-color:var(--accent)}
+.slideshow-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:2px;padding:0 4px;border:1px solid var(--border);border-radius:20px;background:var(--surface);pointer-events:auto}
+.slideshow-dot{display:grid;place-items:center;width:24px;height:24px;border:0;background:none;padding:0;border-radius:50%}
+.slideshow-dot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.slideshow-dot[aria-current="true"]::before{background:var(--accent);width:8px;height:8px}

@@ -40,7 +40,7 @@ config.games.forEach(game => {
   const url = new URL(game.url, location.href);
   if (!['https:', 'http:'].includes(url.protocol)) return;
   const card = element('article', 'game-card');
-  const link = element('a', 'game-link');
+  const link = element('a', 'play-button', '▷  Play now');
   link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
   link.setAttribute('aria-label', `Play ${game.title} on ${game.platform} (opens in a new tab)`);
   const cover = element('div', 'game-cover');
@@ -57,8 +57,8 @@ config.games.forEach(game => {
   const body = element('div', 'game-body');
   body.append(element('span', 'game-category', game.category), element('h3', 'game-title', game.title), element('p', 'game-description', game.description));
   const bottom = element('div', 'card-bottom');
-  bottom.append(element('span', 'play-button', '▷  Play now'), element('span', 'platform-note', 'Opens on Unity Play'));
-  body.append(bottom); link.append(cover, body); card.append(link); grid.append(card);
+  bottom.append(link, element('span', 'platform-note', 'Opens on Unity Play'));
+  body.append(bottom); card.append(cover, body); grid.append(card);
   if (images.length > 1) createSlideshow(card, cover, images, game.title);
 });
 
@@ -70,7 +70,6 @@ function createSlideshow(card, cover, images, title) {
   let timer = null;
   let holdUntil = 0;
   let gesture = null;
-  let suppressClickUntil = 0;
   card.classList.add('has-slideshow');
   images.forEach(image => { image.draggable = false; });
 
@@ -84,7 +83,7 @@ function createSlideshow(card, cover, images, title) {
     button.addEventListener('click', () => navigate(direction));
     controls.append(button);
   }
-  // Sibling controls keep navigation buttons outside the game link.
+  // Screenshot navigation is separate from the Play now link.
   card.append(controls);
 
   function show(index) {
@@ -122,19 +121,11 @@ function createSlideshow(card, cover, images, title) {
     const dy = event.clientY - gesture.y;
     gesture = null;
     if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-      suppressClickUntil = Date.now() + 600;
       event.preventDefault();
       navigate(dx < 0 ? 1 : -1);
     } else schedule();
   });
   cover.addEventListener('pointercancel', () => { gesture = null; schedule(); });
-  // A horizontal swipe changes screenshots without following the play link.
-  card.addEventListener('click', event => {
-    if (Date.now() < suppressClickUntil && cover.contains(event.target)) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }, true);
   reducedMotion.addEventListener('change', schedule);
   document.addEventListener('visibilitychange', schedule);
   schedule();

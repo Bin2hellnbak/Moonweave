@@ -51,3 +51,16 @@
   .has-slideshow:hover .slideshow-controls,.slideshow-controls:focus-within{opacity:1}
   .has-slideshow:hover .slideshow-arrow,.slideshow-controls:focus-within .slideshow-arrow{pointer-events:auto}
 }
+
+/* Decorative seasonal layer stays behind the site and never receives input. */
+.seasonal-background{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.site-shell{position:relative;z-index:1}
+.appearance-panel{max-height:calc(100svh - 110px);overflow-y:auto}
+.seasonal-setting{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 8px}
+.seasonal-label{display:block;font-size:.875rem;font-weight:600}
+.seasonal-description{display:block;margin-top:3px;color:var(--muted);font-size:.8125rem}
+.seasonal-switch{position:relative;width:46px;height:28px;flex:0 0 46px;padding:3px;background:var(--surface-raised);border:1px solid var(--border);border-radius:20px;transition:background .2s,border-color .2s}
+.seasonal-switch>span{display:block;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.seasonal-switch[aria-checked="true"]{background:var(--accent);border-color:var(--accent)}
+.seasonal-switch[aria-checked="true"]>span{transform:translateX(18px);background:var(--accent-ink)}
+.appearance-panel .seasonal-status{font-size:.75rem;line-height:1.5;margin:0 0 22px;max-width:260px}

@@ -7,11 +7,13 @@
   <meta name="theme-color" content="#100e18">
   <title>Moonweave · A little space for games</title>
   <link rel="icon" href="assets/moon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=20261124-stationary-cards">
+  <link rel="stylesheet" href="styles.css?v=20261124-seasons">
   <script src="content.js?v=20261124-showcase" defer></script>
   <script src="app.js?v=20261124-no-collection-heading" defer></script>
+  <script src="seasonal.js?v=20261124-seasons" defer></script>
 </head>
 <body>
+  <canvas class="seasonal-background" id="seasonal-background" aria-hidden="true" hidden></canvas>
   <a class="skip-link" href="#games">Skip to games</a>
   <div class="site-shell">
     <header class="site-header">
@@ -20,6 +22,8 @@
       <section class="appearance-panel" id="appearance-panel" aria-label="Appearance settings" hidden>
         <h2>Make it yours</h2><p>A different mood, same little universe.</p>
         <fieldset><legend>Theme</legend><div class="choice-row"><button data-theme-choice="system" aria-pressed="true">System</button><button data-theme-choice="dark" aria-pressed="false">Dark</button><button data-theme-choice="light" aria-pressed="false">Light</button></div></fieldset>
+        <div class="seasonal-setting"><div><span class="seasonal-label" id="seasonal-label">Seasonal effects</span><span class="seasonal-description">A little holiday atmosphere.</span></div><button class="seasonal-switch" id="seasonal-toggle" type="button" role="switch" aria-checked="true" aria-labelledby="seasonal-label" aria-describedby="seasonal-status"><span aria-hidden="true"></span></button></div>
+        <p class="seasonal-status" id="seasonal-status" aria-live="polite">Automatically appears within two weeks of each holiday.</p>
         <fieldset><legend>Accent colour</legend><div class="choice-row accents"><button data-accent-choice="purple" aria-label="Purple accent" aria-pressed="true" style="--swatch:#b49aff"></button><button data-accent-choice="blue" aria-label="Blue accent" aria-pressed="false" style="--swatch:#8cbbff"></button><button data-accent-choice="rose" aria-label="Rose accent" aria-pressed="false" style="--swatch:#ef9fbe"></button></div></fieldset>
         <button class="reset-button" id="reset-appearance">Reset appearance</button>
       </section>

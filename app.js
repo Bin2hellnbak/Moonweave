@@ -32,7 +32,6 @@ document.querySelectorAll('[data-site-name]').forEach(element => { element.textC
 document.title = `${config.name} · A little space for games`;
 document.querySelector('#site-intro').textContent = config.intro;
 document.querySelector('#copyright').textContent = `© ${new Date().getFullYear()} ${config.name}`;
-document.querySelector('#game-count').textContent = `${config.games.length} ${config.games.length === 1 ? 'game' : 'games'}`;
 document.querySelector('#filter-count').textContent = config.games.length;
 const grid = document.querySelector('#game-grid');
 function element(tag, className, text) { const node = document.createElement(tag); node.className = className; if (text) node.textContent = text; return node; }

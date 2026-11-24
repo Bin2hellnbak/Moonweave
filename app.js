@@ -54,6 +54,7 @@ config.games.forEach(game => {
   });
   cover.append(element('span', 'cover-label', game.platform));
   const body = element('div', 'game-body');
+  body.append(element('h3', 'game-title', game.title), element('p', 'game-description', game.description));
   const tagValues = Array.isArray(game.tags) ? game.tags : (game.category ? [game.category] : []);
   const tags = [...new Set(tagValues.filter(tag => typeof tag === 'string').map(tag => tag.trim()).filter(Boolean))];
   if (tags.length) {
@@ -62,7 +63,6 @@ config.games.forEach(game => {
     tags.forEach(tag => tagList.append(element('li', 'game-tag', tag)));
     body.append(tagList);
   }
-  body.append(element('h3', 'game-title', game.title), element('p', 'game-description', game.description));
   const bottom = element('div', 'card-bottom');
   bottom.append(link, element('span', 'platform-note', 'Opens on Unity Play'));
   body.append(bottom); card.append(cover, body); grid.append(card);

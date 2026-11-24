@@ -8,7 +8,7 @@ window.MOONWEAVE = {
     {
       title: 'Molopony',
       description: 'A board, a roll of the dice, and your next move.',
-      tags: ['Board game', 'Multiplayer'],
+      tags: ['Board game', 'Multiplayer', 'Mobile'],
       platform: 'Unity Play',
       cover: 'assets/molopony-full-board.jpg',
       screenshots: [

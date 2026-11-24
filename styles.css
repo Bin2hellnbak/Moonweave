@@ -31,3 +31,9 @@
 .other-site-card:hover .other-site-visit{color:var(--accent-strong)}
 .other-site-domain{font-size:.75rem;color:var(--muted)}
 @media(max-width:650px){.other-sites{padding:28px 0 36px}.other-sites-grid{grid-template-columns:1fr}.other-site-body{padding:22px}.other-site-art{height:140px}}
+/* Orbital artwork inspired by the Eon Games logo animation. */
+.eon-art{gap:20px;padding:12px 24px;background:radial-gradient(ellipse at 30% 50%,var(--accent-soft),transparent 70%),var(--surface-raised)}
+.eon-orbits{width:clamp(120px,45%,210px);height:auto;flex-shrink:0;filter:drop-shadow(0 0 6px var(--glow))}
+.eon-art .other-site-wordmark{display:block;font-size:2.75rem;letter-spacing:-1.5px}
+.eon-art .other-site-wordmark>span{display:block;margin-top:8px;font-size:.875rem;letter-spacing:4px}
+@media(max-width:650px){.eon-art{gap:12px;padding:12px 18px}.eon-art .other-site-wordmark{font-size:2.25rem}}

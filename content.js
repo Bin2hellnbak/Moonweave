@@ -23,7 +23,7 @@ window.MOONWEAVE = {
     {
       title: 'Darts Together!',
       description: 'Step up to the oche, take aim and challenge the bot. Make every dart count.',
-      tags: ['Darts', 'Sports', 'Single player', 'Mobile'],
+      tags: ['Sports', 'Single player', 'Multiplayer', 'Mobile'],
       platform: 'Unity Play',
       cover: 'assets/darts-together-cover.svg',
       url: 'https://play.unity.com/en/games/f83290b8-8241-4da0-be8c-68585ac003c3/darts-together'

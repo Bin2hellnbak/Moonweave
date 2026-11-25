@@ -19,6 +19,14 @@ window.MOONWEAVE = {
         { src: 'assets/molopony-victory.jpg', alt: 'You win: a crowned player celebrating while banknotes rain over the board' }
       ],
       url: 'https://play.unity.com/en/games/ca80f454-c6a9-4d45-bdf2-18549747b6c5/molopony'
+    },
+    {
+      title: 'Darts Together!',
+      description: 'Step up to the oche, take aim and challenge the bot. Make every dart count.',
+      tags: ['Darts', 'Sports', 'Single player', 'Mobile'],
+      platform: 'Unity Play',
+      cover: 'assets/darts-together-cover.svg',
+      url: 'https://play.unity.com/en/games/f83290b8-8241-4da0-be8c-68585ac003c3/darts-together'
     }
   ]
 };

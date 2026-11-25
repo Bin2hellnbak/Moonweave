@@ -32,8 +32,8 @@ document.querySelectorAll('[data-site-name]').forEach(element => { element.textC
 document.title = `${config.name} · A little space for games`;
 document.querySelector('#site-intro').textContent = config.intro;
 document.querySelector('#copyright').textContent = `© ${new Date().getFullYear()} ${config.name}`;
-document.querySelector('#filter-count').textContent = config.games.length;
 const grid = document.querySelector('#game-grid');
+const renderedGames = [];
 function element(tag, className, text) { const node = document.createElement(tag); node.className = className; if (text) node.textContent = text; return node; }
 config.games.forEach(game => {
   const url = new URL(game.url, location.href);
@@ -66,8 +66,49 @@ config.games.forEach(game => {
   const bottom = element('div', 'card-bottom');
   bottom.append(link, element('span', 'platform-note', 'Opens on Unity Play'));
   body.append(bottom); card.append(cover, body); grid.append(card);
+  renderedGames.push({ card, tags });
   if (images.length > 1) createSlideshow(card, cover, images, game.title);
 });
+
+createGameFilters(renderedGames);
+
+function createGameFilters(games) {
+  const row = document.querySelector('#game-filters');
+  const status = document.querySelector('#filter-status');
+  const labels = new Map();
+  games.forEach(game => game.tags.forEach(tag => {
+    const key = tag.toLowerCase();
+    if (!labels.has(key)) labels.set(key, tag);
+  }));
+  const filters = [
+    { key: null, label: 'All games' },
+    ...[...labels].map(([key, label]) => ({ key, label })).sort((a, b) => a.label.localeCompare(b.label))
+  ];
+  row.replaceChildren();
+  const matches = (game, key) => key === null || game.tags.some(tag => tag.toLowerCase() === key);
+  const buttons = filters.map(filter => {
+    const button = element('button', 'game-filter');
+    button.type = 'button';
+    button.setAttribute('aria-controls', 'game-grid');
+    button.setAttribute('aria-pressed', String(filter.key === null));
+    const count = games.filter(game => matches(game, filter.key)).length;
+    const badge = element('span', 'filter-count', String(count));
+    if (filter.key === null) badge.id = 'filter-count';
+    button.append(document.createTextNode(filter.label + ' '), badge);
+    button.addEventListener('click', () => {
+      games.forEach(game => {
+        game.card.hidden = !matches(game, filter.key);
+        game.card.dispatchEvent(new Event('slideshowvisibilitychange'));
+      });
+      buttons.forEach((item, index) => item.setAttribute('aria-pressed', String(filters[index].key === filter.key)));
+      status.textContent = filter.key === null
+        ? `Showing all ${count} ${count === 1 ? 'game' : 'games'}.`
+        : `Showing ${count} ${count === 1 ? 'game' : 'games'} tagged ${filter.label}.`;
+    });
+    row.append(button);
+    return button;
+  });
+}
 
 function createSlideshow(card, cover, images, title) {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -105,7 +146,7 @@ function createSlideshow(card, cover, images, title) {
   function schedule() {
     clearTimeout(timer);
     timer = null;
-    if (reducedMotion.matches || document.hidden || gesture) return;
+    if (reducedMotion.matches || document.hidden || card.hidden || gesture) return;
     timer = setTimeout(() => {
       show(current + 1);
       schedule();
@@ -135,5 +176,6 @@ function createSlideshow(card, cover, images, title) {
   cover.addEventListener('pointercancel', () => { gesture = null; schedule(); });
   reducedMotion.addEventListener('change', schedule);
   document.addEventListener('visibilitychange', schedule);
+  card.addEventListener('slideshowvisibilitychange', schedule);
   schedule();
 }
